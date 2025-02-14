@@ -6,7 +6,7 @@ package graph
 
 import (
 	"context"
-	"github.com/KaffeeMaschina/ozon_test_task/graph/model"
+	"github.com/KaffeeMaschina/ozon_test_task/internals/graph/model"
 )
 
 // CreateUser is the resolver for the createUser field.

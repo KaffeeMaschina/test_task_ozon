@@ -1,46 +1,30 @@
 -- +goose Up
     create table if not exists users (
-        user_id serial primary key,
+        id serial primary key,
         username text not null,
-        email text not null
-    );
-    create type allowComments as enum (
-        'yes',
-        'no'
+        email text not null unique
     );
 
     create table if not exists posts (
-        post_id serial primary key,
-        fk_user_id int not null,
-        title text,
-        body text,
-        permission allowComments
+        id serial primary key,
+        user_id int not null,
+        title text not null,
+        body text not null,
+        permission bool,
+        foreign key (user_id) references users(id) on delete cascade
     );
 
     create table if not exists comments(
-        comment_id serial primary key,
-        fk_user_id int not null,
-        fk_post_id int not null,
-        fk_parent_id int not null,
-        body text,
-        created_at timeStamp
+        id serial primary key,
+        user_id int not null,
+        post_id int not null,
+        parent_id int not null,
+        body text not null,
+        created_at timeStamp default current_timestamp,
+        foreign key (user_id) references users(id) on delete cascade,
+        foreign key (post_id) references posts(id) on delete cascade,
+        foreign key (parent_id) references comments(id) on delete cascade
     );
-
-    alter table posts
-    add constraint fk_posts_users
-    foreign key (fk_user_id) references users(user_id);
-
-    alter table comments
-    add constraint fk_comments_users
-    foreign key (fk_user_id) references users(user_id);
-
-    alter table comments
-    add constraint fk_comments_posts
-    foreign key (fk_post_id) references users(user_id);
-
-    alter table comments
-    add constraint fk_parent_comment
-    foreign key (fk_parent_id) references comments(comment_id);
 
 
 
@@ -49,13 +33,13 @@ SELECT 'up SQL query';
 -- +goose StatementEnd
 
 -- +goose Down
-    drop table users;
-
-    drop table posts;
 
     drop table comments;
 
-    drop type allowComments;
+    drop table posts;
+
+    drop table users;
+
 -- +goose StatementBegin
 SELECT 'down SQL query';
 -- +goose StatementEnd

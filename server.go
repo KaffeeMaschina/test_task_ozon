@@ -6,9 +6,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/KaffeeMaschina/ozon_test_task/graph"
-	config "github.com/KaffeeMaschina/ozon_test_task/internals"
+	"github.com/KaffeeMaschina/ozon_test_task/config"
+	graph2 "github.com/KaffeeMaschina/ozon_test_task/internals/graph"
 	"github.com/KaffeeMaschina/ozon_test_task/internals/storage"
 	"github.com/vektah/gqlparser/v2/ast"
 	"log"
@@ -42,7 +41,7 @@ func main() {
 		log.Println("using cache")
 	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{store}}))
+	srv := handler.New(graph2.NewExecutableSchema(graph2.Config{Resolvers: &graph2.Resolver{store}}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
@@ -55,9 +54,8 @@ func main() {
 		Cache: lru.New[string](100),
 	})
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Printf("connected to http://localhost:%s/", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

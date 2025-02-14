@@ -2,7 +2,7 @@ package storage
 
 import (
 	"fmt"
-	"github.com/KaffeeMaschina/ozon_test_task/graph/model"
+	"github.com/KaffeeMaschina/ozon_test_task/internals/graph/model"
 	"github.com/google/uuid"
 	"log"
 	"time"
@@ -81,22 +81,22 @@ func (c *Cache) AddUser(name, email string) (*model.User, error) {
 }
 
 // AddPost adds post to cache, and returns this post or returns error if the is no such user, empty text or title
-func (c *Cache) AddPost(userID string, title string, text string, allowComments bool) (*model.Post, error) {
+func (c *Cache) AddPost(userId string, title string, text string, allowComments bool) (*model.Post, error) {
 	var comments []*model.Comment
 
 	// Return error if there is no such user
-	user, ok := c.UserCache[userID]
+	user, ok := c.UserCache[userId]
 	if !ok {
-		return nil, fmt.Errorf("User: %v doesn't exist", userID)
+		return nil, fmt.Errorf("User: %v doesn't exist", userId)
 	}
 
 	// Returns error if the title
 	if title == "" {
-		return nil, fmt.Errorf("Title: %v is empty", userID)
+		return nil, fmt.Errorf("Title: %v is empty", userId)
 	}
 	// Returns error if the text is empty
 	if text == "" {
-		return nil, fmt.Errorf("User: %v doesn't exist", userID)
+		return nil, fmt.Errorf("User: %v doesn't exist", userId)
 	}
 
 	if !allowComments {
@@ -107,7 +107,7 @@ func (c *Cache) AddPost(userID string, title string, text string, allowComments 
 	id := uuid.New()
 	post := &model.Post{
 		ID:            id.String(),
-		UserID:        userID,
+		UserID:        userId,
 		Title:         title,
 		Text:          text,
 		Comments:      comments,

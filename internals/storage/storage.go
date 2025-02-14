@@ -1,6 +1,8 @@
 package storage
 
-import "github.com/KaffeeMaschina/ozon_test_task/graph/model"
+import (
+	"github.com/KaffeeMaschina/ozon_test_task/internals/graph/model"
+)
 
 type Storage interface {
 	AddUser(name, email string) (*model.User, error)

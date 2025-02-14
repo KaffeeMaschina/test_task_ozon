@@ -1,0 +1,19 @@
+###
+GRAPHQL http://localhost:8080/query
+
+mutation createUser{
+    createUser(username:"nikitaA", email: "nikitaki.@gmail.com"){
+        id
+        email
+        username
+
+    }
+}
+mutation createPost{
+    createPost(userId: "1", title: "second Post",
+        text: "text of the second Post", allowComments: true){
+        id
+        userId
+        allowComments
+    }
+}
