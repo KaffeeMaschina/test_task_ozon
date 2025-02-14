@@ -9,6 +9,6 @@ RUN go build -o ./bin/myHabr_server server.go
 FROM alpine:3.21
 
 WORKDIR /root/
-COPY --from=builder /github.com/KaffeeMaschina/ozon_test_task/source//bin/myHabr_server .
+COPY --from=builder /github.com/KaffeeMaschina/ozon_test_task/source/bin/myHabr_server .
 
-CMD ["./myHabr_server"]
+CMD ["./myHabr_server", "-usePostgres"]

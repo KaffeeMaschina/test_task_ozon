@@ -6,14 +6,28 @@ mutation createUser{
         id
         email
         username
-
     }
 }
 mutation createPost{
-    createPost(userId: "1", title: "second Post",
-        text: "text of the second Post", allowComments: true){
+    createPost(userId: "", title: "",
+        text: "", allowComments: true){
         id
         userId
+        title
+        text
+        comments
         allowComments
+    }
+}
+mutation createComment{
+    createComment(userId: "", postId: "",
+        parentId: "", text: "", ){
+        id
+        userId
+        postId
+        parentId
+        text
+        createdAt
+        children
     }
 }

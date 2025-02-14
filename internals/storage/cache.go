@@ -5,6 +5,7 @@ import (
 	"github.com/KaffeeMaschina/ozon_test_task/internals/graph/model"
 	"github.com/google/uuid"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -16,6 +17,7 @@ type Cache struct {
 	UserCache     map[string]*model.User
 	PostsCache    map[string]*model.Post
 	CommentsCache map[string]*model.Comment
+	m             sync.RWMutex
 }
 
 // NewCache creates a new cache instance
@@ -29,6 +31,9 @@ func NewCache() *Cache {
 
 // GetPost returns post via id, or return error if there is no such post
 func (c *Cache) GetPost(postId string) (*model.Post, error) {
+	c.m.RLock()
+	defer c.m.RUnlock()
+
 	post, ok := c.PostsCache[postId]
 	if !ok {
 		return nil, fmt.Errorf("No such post: %v", postId)
@@ -39,9 +44,14 @@ func (c *Cache) GetPost(postId string) (*model.Post, error) {
 // GetAllPosts returns all posts from cache
 func (c *Cache) GetAllPosts() ([]*model.Post, error) {
 	var posts []*model.Post
+
+	c.m.RLock()
+	defer c.m.RUnlock()
+
 	for _, post := range c.PostsCache {
 		posts = append(posts, post)
 	}
+
 	if len(posts) == 0 {
 		log.Println("There is no post in the cache")
 	}
@@ -51,7 +61,8 @@ func (c *Cache) GetAllPosts() ([]*model.Post, error) {
 // AddUser adds user to cache, and returns this user
 // or returns error if there is already a user with such name or such email.
 func (c *Cache) AddUser(name, email string) (*model.User, error) {
-
+	c.m.Lock()
+	defer c.m.Unlock()
 	// Check if there is a user with such name or email
 	for _, user := range c.UserCache {
 		if user.Username == name {
@@ -83,6 +94,9 @@ func (c *Cache) AddUser(name, email string) (*model.User, error) {
 // AddPost adds post to cache, and returns this post or returns error if the is no such user, empty text or title
 func (c *Cache) AddPost(userId string, title string, text string, allowComments bool) (*model.Post, error) {
 	var comments []*model.Comment
+
+	c.m.Lock()
+	defer c.m.Unlock()
 
 	// Return error if there is no such user
 	user, ok := c.UserCache[userId]
@@ -125,6 +139,9 @@ func (c *Cache) AddPost(userId string, title string, text string, allowComments 
 // AddComment adds comment to cache, and returns this comment or returns error if there is no such user or post,
 // if comments are not allowed. It returns error if comment is empty or more then 2000 symbols.
 func (c *Cache) AddComment(userId, postId, parentId, text string) (*model.Comment, error) {
+
+	c.m.Lock()
+	defer c.m.Unlock()
 
 	// Check the length of the comment, if it is empty or more the 2000 symbols return mistake
 	if text == "" {
