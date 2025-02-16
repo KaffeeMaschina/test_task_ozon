@@ -7,31 +7,63 @@ package graph
 import (
 	"context"
 	"github.com/KaffeeMaschina/ozon_test_task/internals/graph/model"
+	"log/slog"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, username string, email string) (*model.User, error) {
-	return r.Storage.AddUser(username, email)
+	user, err := r.Storage.AddUser(username, email)
+	if err != nil {
+		r.Log.Error(err.Error())
+		return nil, err
+	}
+	r.Log.Debug("User is successfully added", slog.String("user", user.Username), slog.String("user id", user.ID))
+	return user, err
 }
 
 // CreatePost is the resolver for the createPost field.
 func (r *mutationResolver) CreatePost(ctx context.Context, userID string, title string, text string, allowComments bool) (*model.Post, error) {
-	return r.Storage.AddPost(userID, title, text, allowComments)
+	post, err := r.Storage.AddPost(userID, title, text, allowComments)
+	if err != nil {
+		r.Log.Error(err.Error())
+		return nil, err
+	}
+	r.Log.Debug("Post is successfully added", slog.String("post", post.Title), slog.String("post id", post.ID))
+	return post, err
 }
 
 // CreateComment is the resolver for the createComment field.
 func (r *mutationResolver) CreateComment(ctx context.Context, userID string, postID string, parentID string, text string) (*model.Comment, error) {
-	return r.Storage.AddComment(userID, postID, parentID, text)
+	comment, err := r.Storage.AddComment(userID, postID, parentID, text)
+	if err != nil {
+		r.Log.Error(err.Error())
+		return nil, err
+	}
+	r.Log.Debug("Comment is successfully added", slog.String("comment", comment.Text), slog.String("comment id", comment.ID))
+	return comment, nil
 }
 
 // Posts is the resolver for the posts field.
 func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	return r.Storage.GetAllPosts()
+	posts, err := r.Storage.GetAllPosts()
+	if err != nil {
+		r.Log.Error(err.Error())
+		return nil, err
+	}
+	r.Log.Debug("Posts are successfully returned")
+	return posts, nil
 }
 
 // Post is the resolver for the post field.
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	return r.Storage.GetPost(id)
+
+	post, err := r.Storage.GetPost(id)
+	if err != nil {
+		r.Log.Error(err.Error())
+		return nil, err
+	}
+	r.Log.Debug("Post is successfully returned", slog.String("post", post.Title), slog.String("post id", post.ID))
+	return post, nil
 }
 
 // Mutation returns MutationResolver implementation.

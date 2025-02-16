@@ -1,6 +1,9 @@
 package graph
 
-import "github.com/KaffeeMaschina/ozon_test_task/internals/storage"
+import (
+	"github.com/KaffeeMaschina/ozon_test_task/internals/storage"
+	"log/slog"
+)
 
 // This file will not be regenerated automatically.
 //
@@ -8,4 +11,5 @@ import "github.com/KaffeeMaschina/ozon_test_task/internals/storage"
 
 type Resolver struct {
 	Storage storage.Storage
+	Log     *slog.Logger
 }

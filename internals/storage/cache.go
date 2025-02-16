@@ -36,6 +36,7 @@ func (c *Cache) GetPost(postId string) (*model.Post, error) {
 
 	post, ok := c.PostsCache[postId]
 	if !ok {
+
 		return nil, fmt.Errorf("No such post: %v", postId)
 	}
 	return post, nil
@@ -87,7 +88,6 @@ func (c *Cache) AddUser(name, email string) (*model.User, error) {
 	// Add user to cache
 	c.UserCache[id.String()] = user
 
-	log.Printf("User: %v, is successfully added", name)
 	return user, nil
 }
 
@@ -132,7 +132,6 @@ func (c *Cache) AddPost(userId string, title string, text string, allowComments 
 
 	// Add post to cache
 	c.PostsCache[post.ID] = post
-	log.Printf("Post: %v, is successfully added", title)
 	return post, nil
 }
 
@@ -185,7 +184,6 @@ func (c *Cache) AddComment(userId, postId, parentId, text string) (*model.Commen
 
 		post.Comments = append(post.Comments, comment)
 
-		log.Printf("Comment to post: %v, is successfully added", text)
 		return comment, nil
 	}
 
@@ -209,6 +207,5 @@ func (c *Cache) AddComment(userId, postId, parentId, text string) (*model.Commen
 
 	post.Comments = append(post.Comments, comment)
 
-	log.Printf("Comment to another comment: %v, is successfully added", text)
 	return comment, nil
 }

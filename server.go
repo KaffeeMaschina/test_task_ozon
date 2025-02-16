@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
@@ -10,8 +11,9 @@ import (
 	graph2 "github.com/KaffeeMaschina/ozon_test_task/internals/graph"
 	"github.com/KaffeeMaschina/ozon_test_task/internals/storage"
 	"github.com/vektah/gqlparser/v2/ast"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 const (
@@ -19,8 +21,11 @@ const (
 )
 
 func main() {
+	// TODO: Change config for better realisation
+	log := NewLogger()
+
 	cfg := config.MustLoad()
-	log.Println("config is loaded")
+	log.Info("config is loaded")
 
 	var store storage.Storage
 	var err error
@@ -30,18 +35,21 @@ func main() {
 	flag.Parse()
 
 	if usePostgres {
+
 		store, err = storage.NewPostgresStorage(cfg.Username, cfg.Password,
 			cfg.DBPort, cfg.Database)
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err.Error())
+			os.Exit(1)
 		}
-		log.Println("using postgres")
+		log.Info("using postgres")
+
 	} else {
 		store = storage.NewCache()
-		log.Println("using cache")
+		log.Info("using cache")
 	}
 
-	srv := handler.New(graph2.NewExecutableSchema(graph2.Config{Resolvers: &graph2.Resolver{store}}))
+	srv := handler.New(graph2.NewExecutableSchema(graph2.Config{Resolvers: &graph2.Resolver{store, log}}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
@@ -56,6 +64,12 @@ func main() {
 
 	http.Handle("/query", srv)
 
-	log.Printf("connected to http://localhost:%s/", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Info(fmt.Sprintf("connected to http://localhost:%s/", port))
+	log.Error(http.ListenAndServe(":"+port, nil).Error())
+}
+
+func NewLogger() *slog.Logger {
+	opts := &slog.HandlerOptions{Level: slog.LevelDebug}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, opts))
+	return logger
 }
