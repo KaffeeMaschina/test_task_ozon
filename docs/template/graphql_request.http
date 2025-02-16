@@ -1,33 +1,72 @@
 ###
 GRAPHQL http://localhost:8080/query
 
-mutation createUser{
-    createUser(username:"nikitaA", email: "nikitaki.@gmail.com"){
-        id
-        email
-        username
-    }
-}
-mutation createPost{
-    createPost(userId: "", title: "",
-        text: "", allowComments: true){
-        id
-        userId
-        title
-        text
-        comments
-        allowComments
-    }
-}
-mutation createComment{
-    createComment(userId: "", postId: "",
-        parentId: "", text: "", ){
-        id
-        userId
-        postId
-        parentId
-        text
-        createdAt
-        children
-    }
-}
+#mutation createUser{
+#    createUser(username:"", email: ""){
+#        id
+#        email
+#        username
+#    }
+#}
+
+#mutation createPost{
+#    createPost(userId: "", title: "",
+#        text: "", allowComments:  ){
+#        id
+#        userId
+#        title
+#        text
+#        allowComments
+#    }
+#}
+#mutation createComment{
+#    createComment(userId: "", postId: "",
+#        parentId: "", text: "", ){
+#        id
+#        userId
+#        postId
+#        parentId
+#        text
+#        createdAt
+#        children{
+#            id
+#            userId
+#            parentId
+#            text
+#            createdAt
+#            children{
+#                id
+#                userId
+#                parentId
+#                text
+#                createdAt
+#            }
+#        }
+#    }
+#}
+
+#query {
+#    posts{
+#        id
+#        userId
+#        title
+#        text
+#        allowComments
+#    }
+#}
+# query {
+#     post(id: ){
+#         userId
+#         userId
+#         title
+#         text
+#         comments{
+#             id
+#             userId
+#             postId
+#             parentId
+#             text
+#         }
+#         allowComments
+#     }
+# }
