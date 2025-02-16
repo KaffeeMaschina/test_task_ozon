@@ -18,7 +18,7 @@
         id serial primary key,
         user_id int not null,
         post_id int not null,
-        parent_id int not null,
+        parent_id int,
         body text not null,
         created_at timeStamp default current_timestamp,
         foreign key (user_id) references users(id) on delete cascade,
