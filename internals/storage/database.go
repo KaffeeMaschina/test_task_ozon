@@ -231,6 +231,14 @@ func (s *PostgresStorage) AddPost(userId string, title string, text string, allo
 func (s *PostgresStorage) AddComment(userId, postId, parentId, text string) (*model.Comment, error) {
 	const op = "storage.database.AddComment"
 
+	var permission bool
+	err := s.DB.QueryRow(context.Background(), "SELECT permission FROM posts WHERE id = $1", postId).Scan(&permission)
+	if err != nil {
+		return nil, fmt.Errorf("unable to check if post: %v has a permission to add comments %s: %w", postId, op, err)
+	}
+	if !permission {
+		return nil, fmt.Errorf("unable to add comment: %v has no permission to add comments %s: %w", postId, op, err)
+	}
 	tx, err := s.DB.Begin(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("%w", err)
